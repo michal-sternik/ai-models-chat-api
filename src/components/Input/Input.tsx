@@ -18,7 +18,7 @@ const Input = ({
   handleFileSelection,
 }: InputProps) => {
   return (
-    <div className="flex items-center gap-2 p-2 bg-gray-600 rounded-lg text-xs lg:text-base">
+    <div className="flex items-center gap-2 p-2 bg-gray-600 rounded-lg text-xs lg:text-base overflow-x-auto">
       <input
         value={input}
         onChange={(e) => setInput(e.target.value)}
@@ -28,12 +28,23 @@ const Input = ({
         placeholder="Send a message..."
         className="flex-1 p-2 rounded bg-gray-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
       />
+      <button
+        onClick={sendMessage}
+        className={`${
+          isLoading
+            ? "bg-gray-500"
+            : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
+        }  px-4 py-2 rounded shadow   duration-200 text-white`}
+        disabled={isLoading}
+      >
+        {isLoading ? "..." : "Send"}
+      </button>
       <label
         className={`${
           isLoading
             ? "bg-gray-500"
             : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-        } w-30 px-4 py-2 rounded shadow duration-200 text-white flex items-center justify-center gap-2 custom-scroll overflow-auto text-nowrap`}
+        } w-30 px-4 py-2 rounded shadow duration-200 text-white flex items-center justify-center gap-2 custom-scroll  whitespace-nowrap`}
       >
         <input
           type="file"
@@ -58,25 +69,13 @@ const Input = ({
           X
         </span>
       )}
-
-      <button
-        onClick={sendMessage}
-        className={`${
-          isLoading
-            ? "bg-gray-500"
-            : "bg-blue-600 hover:bg-blue-700 cursor-pointer"
-        }  px-4 py-2 rounded shadow   duration-200 text-white`}
-        disabled={isLoading}
-      >
-        {isLoading ? "..." : "Send"}
-      </button>
       <button
         onClick={clearChat}
         className={`${
           isLoading
             ? "bg-red-500"
             : "bg-red-600 hover:bg-red-700 cursor-pointer"
-        }  px-4 py-2 rounded shadow   duration-200 text-white`}
+        }  px-4 py-2 rounded shadow   duration-200 text-white whitespace-nowrap`}
         disabled={isLoading}
       >
         Clear chat

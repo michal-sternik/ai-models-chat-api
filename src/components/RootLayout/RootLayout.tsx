@@ -36,7 +36,7 @@ function RootLayout() {
   }, [messages]);
 
   return (
-    <div className="flex flex-col md:w-2/3 w-full h-screen bg-gray-500 rounded-xl p-4 gap-3">
+    <div className="flex flex-col md:w-2/3 w-full h-screen bg-gray-500 rounded-xl p-4 gap-3 ">
       <HeaderBar
         numberOfPreviousMessagesAttached={numberOfPreviousMessagesAttached}
         setNumberOfPreviousMessagesAttached={
