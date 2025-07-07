@@ -18,7 +18,7 @@ const Input = ({
   handleFileSelection,
 }: InputProps) => {
   return (
-    <div className="flex items-center gap-2 p-2 bg-gray-600 rounded-lg text-xs lg:text-base overflow-x-auto">
+    <div className="flex items-center gap-2 p-2 bg-gray-600 rounded-lg text-xs lg:text-base overflow-x-auto overflow-y-hidden">
       <input
         value={input}
         onChange={(e) => setInput(e.target.value)}
