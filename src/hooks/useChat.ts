@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { deleteAllGeminiFiles, sendGeminiMessage } from "../api/geminiService";
-import type { Message } from "../types/types";
+import type { BotMessage, Message } from "../types/types";
 import { generateId } from "../lib/utils/generateId";
-import { SAVE_MAX_MESSAGES } from "../lib/constants/constants";
+import { SAVE_MAX_MESSAGES } from "../settings";
+import { sendMistralMessage } from "@/api/mistralService";
 
-export const useChat = () => {
+export const useChat = (selectedModel: string) => {
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const isInitialLoad = useRef(true);
@@ -15,11 +16,11 @@ export const useChat = () => {
   ] = useState<number>(SAVE_MAX_MESSAGES);
 
   useEffect(() => {
-    const savedMessages = localStorage.getItem("chatMessages");
+    const savedMessages = localStorage.getItem(`chatMessages-${selectedModel}`);
     if (savedMessages) {
       setMessages(JSON.parse(savedMessages));
     }
-  }, []);
+  }, [selectedModel]);
 
   //we have to use useRef to avoid saving the empty state on the first render
   useEffect(() => {
@@ -28,13 +29,17 @@ export const useChat = () => {
       return;
     }
 
-    localStorage.setItem("chatMessages", JSON.stringify(messages));
-  }, [messages]);
+    localStorage.setItem(
+      `chatMessages-${selectedModel}`,
+      JSON.stringify(messages)
+    );
+  }, [messages, selectedModel]);
 
   const sendMessage = async (
     input: string,
     setInput: (string: string) => void,
-    file?: File
+    file?: File,
+    selectedModel?: string
   ) => {
     if ((!input.trim() && !file) || isLoading) return;
     setIsLoading(true);
@@ -50,28 +55,40 @@ export const useChat = () => {
     setMessages((msgs) => [...msgs, userMsg]);
 
     try {
-      const botMsg = await sendGeminiMessage(
-        messages,
-        input,
-        numberOfPreviousMessagesAttached,
-        file || undefined
-      );
+      let botMsg: Message;
+
+      if (selectedModel === "mistral-3.2-small") {
+        botMsg = await sendMistralMessage(
+          messages,
+          input,
+          numberOfPreviousMessagesAttached,
+          file || undefined
+        );
+      } else if (selectedModel === "gemini-2.5-flash") {
+        botMsg = await sendGeminiMessage(
+          messages,
+          input,
+          numberOfPreviousMessagesAttached,
+          file || undefined
+        );
+      }
+
       setMessages((msgs) => [...msgs, botMsg]);
       if (file) {
         handleFileSelection(null);
       }
       localStorage.setItem(
-        "totalTokenCount",
+        `totalTokenCount-${selectedModel}`,
         (
-          (Number(localStorage.getItem("totalTokenCount")) || 0) +
-          botMsg.totalTokenCount
+          (Number(localStorage.getItem(`totalTokenCount-${selectedModel}`)) ||
+            0) + (botMsg! as BotMessage).totalTokenCount
         ).toString()
       );
     } catch (e) {
       const errorMsg: Message = {
         id: generateId(),
         sender: "bot",
-        text: `Błąd: ${e instanceof Error ? e.message : String(e)}`,
+        text: `Error: ${e instanceof Error ? e.message : String(e)}`,
         timestamp: Date.now(),
       };
       setMessages((msgs) => [...msgs, errorMsg]);
@@ -83,7 +100,7 @@ export const useChat = () => {
   const clearChat = () => {
     setMessages([]);
     setFile(null);
-    localStorage.removeItem("chatMessages");
+    localStorage.removeItem(`chatMessages-${selectedModel}`);
     deleteAllGeminiFiles();
     setNumberOfPreviousMessagesAttached(SAVE_MAX_MESSAGES);
   };
