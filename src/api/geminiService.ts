@@ -1,6 +1,11 @@
 import { createPartFromUri, GoogleGenAI } from "@google/genai";
 import type { BotMessage, Message } from "../types/types";
 import { generateId } from "../lib/utils/generateId";
+import {
+  GEMINI_THINKING_BUDGET,
+  GEMINI_TEMPERATURE,
+  GEMINI_MAX_TOKENS,
+} from "@/settings";
 
 const ai = new GoogleGenAI({
   apiKey: import.meta.env.VITE_GEMINI_API_KEY,
@@ -78,7 +83,11 @@ export const sendGeminiMessage = async (
   const result = await ai.models.generateContent({
     model: "gemini-2.5-flash",
     contents,
-    config: { thinkingConfig: { thinkingBudget: 0 } },
+    config: {
+      thinkingConfig: { thinkingBudget: GEMINI_THINKING_BUDGET ?? 10000 },
+      temperature: GEMINI_TEMPERATURE ?? 1.0,
+      maxOutputTokens: GEMINI_MAX_TOKENS ?? 100000,
+    },
   });
 
   const text =
