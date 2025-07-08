@@ -51,7 +51,7 @@ export const useChat = (selectedModel: string) => {
       text: file ? `file: ${file.name}; ${input}` : input,
       timestamp: Date.now(),
     };
-    console.log("Sending message:", userMsg);
+
     setMessages((msgs) => [...msgs, userMsg]);
 
     try {

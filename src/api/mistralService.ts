@@ -17,16 +17,10 @@ export const sendMistralMessage = async (
   numberOfPreviousMessagesAttached: number,
   file?: File
 ): Promise<BotMessage> => {
-  console.log(
-    numberOfPreviousMessagesAttached,
-    "numberOfPreviousMessagesAttached"
-  );
-
   const recentMessages =
     numberOfPreviousMessagesAttached > 0 && messages && messages.length > 0
       ? messages.slice(-numberOfPreviousMessagesAttached)
       : [];
-  console.log("Recent messages:", recentMessages);
 
   const conversationHistory = recentMessages.map((msg) =>
     msg.sender === "bot"

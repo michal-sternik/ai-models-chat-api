@@ -28,15 +28,11 @@ export const sendGeminiMessage = async (
 ): Promise<BotMessage> => {
   let contents;
   let filePart;
-  console.log(
-    numberOfPreviousMessagesAttached,
-    "numberOfPreviousMessagesAttached"
-  );
+
   const recentMessages =
     numberOfPreviousMessagesAttached > 0 && messages && messages.length > 0
       ? messages.slice(-numberOfPreviousMessagesAttached)
       : [];
-  console.log("Recent messages:", recentMessages);
 
   //if we include a file
   if (file) {
