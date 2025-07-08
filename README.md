@@ -88,7 +88,6 @@ export const GEMINI_THINKING_BUDGET = 0; // If 0, then turned off
 ### Technical details
 
 Gemini supports a maximum of **1,000 document pages** per upload. Supported document types must have one of the following MIME types:
-Gemini supports up to **1,000 pages** per document. Supported MIME types:  
 
 **PDF** – `application/pdf`  
 **JavaScript** – `application/x-javascript`, `text/javascript`  
@@ -109,8 +108,10 @@ File support depends on the upload purpose setting:
 
 #### OCR Purpose (`MISTRAL_FILE_PURPOSE = "ocr"`)
 - **Supported**: PDF, DOCX, PPTX, EPUB, RTF, ODT, BibTeX, EndNote, Jupyter, LaTeX, OPML, Troff, DokuWiki
-- **Use Case**: Document analysis, image text extraction
+- **Use Case**: Document analysis
 
+Fallback for types: **TXT, JSON, CSV, MARKDOWN, HTML**.<br>
+Emergency fallback function implemented - if file upload fails - then the text is programmatically extracted and sent as next prompt. You'll be informed with message: _[File upload failed. Emergency fallback activated: file content was extracted programmatically and sent as prompt.]_ 
 
 #### Batch Purpose (`MISTRAL_FILE_PURPOSE = "batch"`)
 - **Supported**: JSONL files for batch processing
