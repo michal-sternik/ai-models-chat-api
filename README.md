@@ -1,69 +1,172 @@
-# React + TypeScript + Vite
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+# AI Model Chat API
 
-Currently, two official plugins are available:
+A chat application that allows users to interact with AI models including Google **Gemini 2.5 Flash** and **Mistral 3.2 Small**. 
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+## Live Demo
 
-## Expanding the ESLint configuration
+The application is deployed and available at: [https://ai-model-chat-api.vercel.app](https://ai-model-chat-api.vercel.app)
 
-If you are developing a production application, we recommend updating the configuration to enable type-aware lint rules:
+## Features
 
-```js
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
+- **Multi-Model Support**: Switch between Google Gemini 2.5 Flash and Mistral 3.2 Small
+- **File Upload**: Support for various file types including PDFs, documents, and images
+- **Context Management**: Adjustable conversation context with slider control
+- **Token Tracking**: Real-time token usage monitoring
+- **Responsive Design**: UI built with shadcn/ui components
+- **Persistent Storage**: Conversation history saved in localStorage
 
-      // Remove tseslint.configs.recommended and replace with this
-      ...tseslint.configs.recommendedTypeChecked,
-      // Alternatively, use this for stricter rules
-      ...tseslint.configs.strictTypeChecked,
-      // Optionally, add this for stylistic rules
-      ...tseslint.configs.stylisticTypeChecked,
+## Supported AI Models
 
-      // Other configs...
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+#### Google Gemini 2.5 Flash
+- **Model ID**: `gemini-2.5-flash`
+- **File Support**: Images (JPEG, PNG, GIF, WebP), PDFs, text files, and more
+
+#### Mistral 3.2 Small
+- **Model ID**: `mistral-small-2506`
+- **File Support**: Depends on upload purpose (see File Upload section)
+
+## Installation
+
+1. Clone the repository:
+```bash
+git clone <repository-url>
+cd ai-model-chat-api
 ```
 
-You can also install [eslint-plugin-react-x](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-x) and [eslint-plugin-react-dom](https://github.com/Rel1cx/eslint-react/tree/main/packages/plugins/eslint-plugin-react-dom) for React-specific lint rules:
-
-```js
-// eslint.config.js
-import reactX from 'eslint-plugin-react-x'
-import reactDom from 'eslint-plugin-react-dom'
-
-export default tseslint.config([
-  globalIgnores(['dist']),
-  {
-    files: ['**/*.{ts,tsx}'],
-    extends: [
-      // Other configs...
-      // Enable lint rules for React
-      reactX.configs['recommended-typescript'],
-      // Enable lint rules for React DOM
-      reactDom.configs.recommended,
-    ],
-    languageOptions: {
-      parserOptions: {
-        project: ['./tsconfig.node.json', './tsconfig.app.json'],
-        tsconfigRootDir: import.meta.dirname,
-      },
-      // other options...
-    },
-  },
-])
+2. Install dependencies:
+```bash
+npm install
 ```
+
+3. Set up environment variables (see Environment Variables section)
+
+4. Start the development server:
+```bash
+npm run dev
+```
+
+The application will be available at `http://localhost:5173`
+
+## Environment Variables
+
+Create a `.env` file in the root directory with the following variables:
+
+```env
+VITE_GEMINI_API_KEY=your_gemini_api_key_here
+VITE_MISTRAL_API_KEY=your_mistral_api_key_here
+```
+The keys could be generated on the API providers dashboard.
+
+
+## Configuration
+
+The application behavior can be customized through the `settings.ts` file:
+
+```typescript
+// Mistral API settings
+export const MISTRAL_MAX_TOKENS = 100000;
+export const MISTRAL_TEMPERATURE = 0.7;
+export const MISTRAL_FILE_PURPOSE = "ocr"; // Options: fine-tune, batch, ocr
+
+// Gemini API settings
+export const GEMINI_MAX_TOKENS = 100000;
+export const GEMINI_TEMPERATURE = 1.0; // Between 0 and 2, default is 1.0
+export const GEMINI_THINKING_BUDGET = 0; // If 0, then turned off
+```
+
+### Configuration Options
+
+#### Model-Specific Settings
+- **Temperature**: Controls response randomness (0 = deterministic, higher = more creative)
+- **Max Tokens**: Maximum amount of tokens that could be spent on one response.
+- **Thinking Budget** (Gemini only): Controls internal reasoning process
+
+## File Upload Support
+
+
+### Technical details
+
+Gemini supports a maximum of **1,000 document pages** per upload. Supported document types must have one of the following MIME types:
+Gemini supports up to **1,000 pages** per document. Supported MIME types:  
+
+**PDF** – `application/pdf`  
+**JavaScript** – `application/x-javascript`, `text/javascript`  
+**Python** – `application/x-python`, `text/x-python`  
+**Text** – `text/plain`  
+**HTML** – `text/html`  
+**CSS** – `text/css`  
+**Markdown** – `text/md`  
+**CSV** – `text/csv`  
+**XML** – `text/xml`  
+**RTF** – `text/rtf`
+
+
+See more detailed description here: https://cloud.google.com/vertex-ai/generative-ai/docs/models/gemini/2-5-flash
+
+### Mistral 3.2 Small
+File support depends on the upload purpose setting:
+
+#### OCR Purpose (`MISTRAL_FILE_PURPOSE = "ocr"`)
+- **Supported**: PDF, DOCX, PPTX, EPUB, RTF, ODT, BibTeX, EndNote, Jupyter, LaTeX, OPML, Troff, DokuWiki
+- **Use Case**: Document analysis, image text extraction
+
+
+#### Batch Purpose (`MISTRAL_FILE_PURPOSE = "batch"`)
+- **Supported**: JSONL files for batch processing
+- **Use Case**: Bulk text processing tasks
+
+
+#### Fine-tune Purpose (`MISTRAL_FILE_PURPOSE = "fine-tune"`)
+- **Supported**: JSONL files with training data
+- **Use Case**: Model customization and training
+
+
+## User Interface
+
+### Design System
+- **Component Library**: [shadcn/ui](https://ui.shadcn.com/) - Modern, accessible React components
+- **Icons**: [Lucide Icons](https://lucide.dev/) - Beautiful, customizable SVG icons
+- **Styling**: Tailwind CSS with custom glassmorphism effects
+
+
+## Architecture
+
+### Project Structure
+```
+src/
+├── api/
+│   ├── geminiService.ts    # Google Gemini API integration
+│   └── mistralService.ts   # Mistral AI API integration
+├── components/
+│   ├── ContextSlider/      # Slider for context size customization
+│   ├── Conversation/       # Chat message display
+│   ├── HeaderBar/          # Model selector and controls
+│   ├── Input/              # Message input and file upload
+│   ├── RootLayout/         # Main application layout
+│   └── TokenInfo/          # Token usage display
+│   └── ui/...          	# folder for shadcn components
+├── hooks/
+│   └── useChat.ts          # Chat state management
+├── lib/
+│   ├── constants/          # Application constants
+│   └── utils/              # Utility functions
+├── types/
+│   └── types.ts            # TypeScript type definitions
+└── settings.ts             # Configuration settings
+```
+### Technology Stack
+- **Frontend**: React 18 with TypeScript
+- **Build Tool**: Vite
+- **Styling**: Tailwind CSS
+- **UI Components**: shadcn/ui
+- **Icons**: Lucide React
+- **AI APIs**: Google Gemini AI, Mistral AI
+
+
+## Troubleshooting
+
+### Common Issues
+1. **API Key Errors**: Verify keys are correctly set in environment variables
+2. **File Upload Failures**: Check file size and format compatibility
+3. **Context Issues**: Adjust context slider if responses seem disconnected
